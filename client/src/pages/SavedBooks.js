@@ -1,55 +1,53 @@
-import React, { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@apollo/client";
-import { QUERY_ME } from "../utils/queries";
-import { REMOVE_BOOK } from "../utils/mutations";
-import { Container, Card, Button, Row, Col } from "react-bootstrap";
-import Auth from "../utils/auth";
-import { saveBookIds, getSavedBookIds } from "../utils/localStorage";
+import React, { useState, useEffect } from "react"; // import react library
+import { useQuery, useMutation } from "@apollo/client"; // import useQuery and useMutation hooks
+import { QUERY_ME } from "../utils/queries"; // import QUERY_ME query
+import { REMOVE_BOOK } from "../utils/mutations"; // import REMOVE_BOOK mutation
+import { Container, Card, Button, Row, Col } from "react-bootstrap"; // import bootstrap components
+import Auth from "../utils/auth"; // import auth.js
+import { saveBookIds, getSavedBookIds } from "../utils/localStorage"; // import saveBookIds() and getSavedBookIds() from localStorage.js
 
-const SavedBooks = () => {
-  const { loading, data } = useQuery(QUERY_ME);
-  const [deleteBook, { error }] = useMutation(REMOVE_BOOK);
-  const [books, setBooks] = useState([]);
-  const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
+const SavedBooks = () => { // define SavedBooks functional component
+  const { loading, data } = useQuery(QUERY_ME); // use QUERY_ME query
+  const [deleteBook, { error }] = useMutation(REMOVE_BOOK); // use REMOVE_BOOK mutation
+  const [books, setBooks] = useState([]); // set books state to empty array
+  const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds()); // set savedBookIds state to getSavedBookIds() function
 
-  useEffect(() => {
-    if (data) {
-      setBooks(data.me.savedBooks);
+  useEffect(() => { // define useEffect hook
+    if (data) { // if data exists
+      setBooks(data.me.savedBooks); // set books state to data.me.savedBooks
     }
 
-    return () => saveBookIds(savedBookIds);
-  }, [data]);
+    return () => saveBookIds(savedBookIds); // return saveBookIds() function with savedBookIds state
+  }, [data]); // add data to dependency array
 
-  const handleDeleteBook = async (bookId) => {
-    const headers = {
-      headers: {
-        Authorization: `Bearer ${Auth.getToken()}`,
+  const handleDeleteBook = async (bookId) => { // define handleDeleteBook function accepting bookId variable
+    const headers = { // define headers variable for simplicity
+      headers: { // define headers
+        Authorization: `Bearer ${Auth.getToken()}`, // set Authorization to Bearer token
       },
     };
 
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
+    const token = Auth.loggedIn() ? Auth.getToken() : null; // define token variable as Auth.loggedIn() ? Auth.getToken() : null
 
-    if (!token) {
-      return false;
+    if (!token) { // if token does not exist
+      return false; // return false
     }
 
     try {
-      await deleteBook({ variables: { bookId }, context: headers });
-      setBooks(books.filter((book) => book.bookId !== bookId));
-      if (savedBookIds.length) {
-        setSavedBookIds(
-          savedBookIds?.filter((savedBookId) => savedBookId !== bookId)
+      await deleteBook({ variables: { bookId }, context: headers }); // define deleteBook variable as deleteBook() function with bookId and headers variables
+      setBooks(books.filter((book) => book.bookId !== bookId)); // set books state to books.filter() function with bookId variable
+      if (savedBookIds.length) { // if savedBookIds.length
+        setSavedBookIds( // set savedBookIds state
+          savedBookIds?.filter((savedBookId) => savedBookId !== bookId) // to savedBookIds?.filter() function with savedBookId variable
         );
       }
 
-      if (!data) {
-        throw new Error("something went wrong!");
-      } else {
-        console.log("data", data);
+      if (!data) { // if data does not exist
+        throw new Error("something went wrong!"); // throw error
       }
-    } catch (err) {
-      console.error("try error", err);
-      console.log("mutation error", error);
+    } catch (err) { // catch error
+      console.error("try error", err); // log try error
+      console.log("mutation error", error); // log mutation error
     }
   };
 
@@ -107,4 +105,4 @@ const SavedBooks = () => {
   );
 };
 
-export default SavedBooks;
+export default SavedBooks; // export SavedBooks functional component

@@ -1,7 +1,7 @@
-import { gql } from '@apollo/client';
+import { gql } from '@apollo/client'; // import gql tagged template function
 
 export const QUERY_USER = gql`
-  query user($username: String!) {
+  query user($username: String!) { // define user query accepting $username variable
     user(username: $username) {
       _id
       username
@@ -20,7 +20,7 @@ export const QUERY_USER = gql`
 `;
 
 export const QUERY_BOOKS = gql`
-  query getBooks {
+  query getBooks { // define getBooks query
     savedBooks {
       _id
       title
@@ -34,7 +34,7 @@ export const QUERY_BOOKS = gql`
 `;
 
 export const QUERY_SINGLE_BOOK = gql`
-  query getSingleBook($bookId: ID!) {
+  query getSingleBook($bookId: ID!) { // define getSingleBook query accepting $bookId variable
     savedBooks(bookId: $bookId) {
       _id
       title
@@ -48,7 +48,7 @@ export const QUERY_SINGLE_BOOK = gql`
 `;
 
 export const QUERY_ME = gql`
-  query me {
+  query me { // define me query
     me {
       _id
       username

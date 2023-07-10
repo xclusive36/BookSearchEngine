@@ -1,50 +1,57 @@
-import React, { useState } from "react";
-import { useMutation } from "@apollo/client";
-import { ADD_USER } from "../utils/mutations";
-import { Form, Button, Alert } from "react-bootstrap";
-
-import Auth from "../utils/auth";
+import React, { useState } from "react"; // import react library
+import { useMutation } from "@apollo/client"; // import useMutation hook
+import { ADD_USER } from "../utils/mutations"; // import ADD_USER mutation
+import { Form, Button, Alert } from "react-bootstrap"; // import bootstrap components
+import Auth from "../utils/auth"; // import auth.js
 
 const SignupForm = () => {
-  const [createUser, { error }] = useMutation(ADD_USER);
+  // define SignupForm functional component
+  const [createUser, { error }] = useMutation(ADD_USER); // use ADD_USER mutation
   const [userFormData, setUserFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
+    // set userFormData state
+    username: "", // set username to empty string
+    email: "", // set email to empty string
+    password: "", // set password to empty string
   });
-  const [validated] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
+  const [validated] = useState(false); // set validated state to false
+  const [showAlert, setShowAlert] = useState(false); // set showAlert state to false
 
   const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setUserFormData({ ...userFormData, [name]: value });
+    // define handleInputChange function accepting event variable
+    const { name, value } = event.target; // define name and value variables as event.target
+    setUserFormData({ ...userFormData, [name]: value }); // set userFormData state
   };
 
   const handleFormSubmit = async (event) => {
-    event.preventDefault();
+    // define handleFormSubmit function accepting event variable
+    event.preventDefault(); // prevent default event behavior
 
-    const form = event.currentTarget;
+    const form = event.currentTarget; // define form variable as event.currentTarget
     if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
+      // if form.checkValidity() is false
+      event.preventDefault(); // prevent default event behavior
+      event.stopPropagation(); // stop event propagation
     }
 
     try {
       const { data } = await createUser({
-        variables: { ...userFormData },
+        // define data variable as createUser() function
+        variables: { ...userFormData }, // with userFormData state
       });
 
-      Auth.login(data.addUser.token);
+      Auth.login(data.addUser.token); // login with data.addUser.token
     } catch (err) {
-      console.error("try error", err);
-      console.log("mutation error", error);
-      setShowAlert(true);
+      // catch error
+      console.error("try error", err); // log try error
+      console.log("mutation error", error); // log mutation error
+      setShowAlert(true); // set showAlert state to true
     }
 
     setUserFormData({
-      username: "",
-      email: "",
-      password: "",
+      // set userFormData state
+      username: "", // set username to empty string
+      email: "", // set email to empty string
+      password: "", // set password to empty string
     });
   };
 
@@ -122,4 +129,4 @@ const SignupForm = () => {
   );
 };
 
-export default SignupForm;
+export default SignupForm; // export SignupForm

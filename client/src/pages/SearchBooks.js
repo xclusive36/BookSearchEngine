@@ -1,93 +1,91 @@
-import React, { useState, useEffect } from "react";
-import { useMutation } from "@apollo/client";
-import { SAVE_BOOK } from "../utils/mutations";
-import { Container, Col, Form, Button, Card, Row } from "react-bootstrap";
-import Auth from "../utils/auth";
-import { saveBookIds, getSavedBookIds } from "../utils/localStorage";
+import React, { useState, useEffect } from "react"; // import react library
+import { useMutation } from "@apollo/client"; // import useMutation hook
+import { SAVE_BOOK } from "../utils/mutations"; // import SAVE_BOOK mutation
+import { Container, Col, Form, Button, Card, Row } from "react-bootstrap"; // import bootstrap components
+import Auth from "../utils/auth"; // import auth.js
+import { saveBookIds, getSavedBookIds } from "../utils/localStorage"; // import saveBookIds() and getSavedBookIds() from localStorage.js
 
-const SearchBooks = () => {
-  const [saveBook, { error }] = useMutation(SAVE_BOOK);
-  const [searchedBooks, setSearchedBooks] = useState([]);
-  const [searchInput, setSearchInput] = useState("");
-  const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
+const SearchBooks = () => { // define SearchBooks functional component
+  const [saveBook, { error }] = useMutation(SAVE_BOOK); // use SAVE_BOOK mutation
+  const [searchedBooks, setSearchedBooks] = useState([]); // set searchedBooks state to empty array
+  const [searchInput, setSearchInput] = useState(""); // set searchInput state to empty string
+  const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds()); // set savedBookIds state to getSavedBookIds() function
 
-  useEffect(() => {
-    return () => saveBookIds(savedBookIds);
+  useEffect(() => { // define useEffect hook
+    return () => saveBookIds(savedBookIds); // return saveBookIds() function with savedBookIds state
   });
 
-  const searchGoogleBooks = (query) => {
-    return fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}`);
+  const searchGoogleBooks = (query) => { // define searchGoogleBooks function accepting query variable
+    return fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}`); // return fetch request to google books api
   };
 
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
+  const handleFormSubmit = async (event) => { // define handleFormSubmit function accepting event variable
+    event.preventDefault(); // prevent default event behavior
 
-    if (!searchInput) {
-      return false;
+    if (!searchInput) { // if searchInput is empty
+      return false; // return false
     }
 
     try {
-      const response = await searchGoogleBooks(searchInput);
+      const response = await searchGoogleBooks(searchInput); // define response variable as searchGoogleBooks() function with searchInput state
 
-      if (!response.ok) {
-        throw new Error("something went wrong!");
+      if (!response.ok) { // if response is not ok
+        throw new Error("something went wrong!"); // throw error
       }
 
-      const { items } = await response.json();
+      const { items } = await response.json(); // define items variable as response.json()
 
-      const bookData = items.map((book) => ({
-        bookId: book.id,
-        authors: book.volumeInfo.authors || ["No author to display"],
-        title: book.volumeInfo.title,
-        description: book.volumeInfo.description,
-        image: book.volumeInfo.imageLinks?.thumbnail || "",
+      const bookData = items.map((book) => ({ // define bookData variable and map through items array
+        bookId: book.id, // set bookId to book.id
+        authors: book.volumeInfo.authors || ["No author to display"], // set authors to book.volumeInfo.authors or "No author to display"
+        title: book.volumeInfo.title, // set title to book.volumeInfo.title
+        description: book.volumeInfo.description, // set description to book.volumeInfo.description
+        image: book.volumeInfo.imageLinks?.thumbnail || "", // set image to book.volumeInfo.imageLinks.thumbnail or empty string
       }));
 
-      setSearchedBooks(bookData);
-      setSearchInput("");
-    } catch (err) {
-      console.error(err);
+      setSearchedBooks(bookData); // set searchedBooks state to bookData
+      setSearchInput(""); // set searchInput state to empty string
+    } catch (err) { // catch error
+      console.error(err); // console.error(err)
     }
   };
 
-  const handleSaveBook = async (bookId) => {
-    const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
+  const handleSaveBook = async (bookId) => { // define handleSaveBook function accepting bookId variable
+    const bookToSave = searchedBooks.find((book) => book.bookId === bookId); // define bookToSave variable as searchedBooks.find() function with bookId variable
 
-    const headers = {
-      headers: {
-        Authorization: `Bearer ${Auth.getToken()}`,
+    const headers = { // define headers variable for simplicity
+      headers: { // define headers
+        Authorization: `Bearer ${Auth.getToken()}`, // set Authorization to Bearer token
       },
     };
 
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
+    const token = Auth.loggedIn() ? Auth.getToken() : null; // define token variable as Auth.loggedIn() ? Auth.getToken() : null
 
-    if (!token) {
-      return false;
+    if (!token) { // if token is null
+      return false; // return false
     }
 
     try {
-      const { data } = await saveBook({
-        variables: {
-          authors: bookToSave.authors,
-          description: bookToSave.description,
-          title: bookToSave.title,
-          bookId: bookToSave.bookId,
-          image: bookToSave.image,
-          link: bookToSave.link,
+      const { data } = await saveBook({ // define data variable as saveBook() function
+        variables: { // define the mutation variables
+          authors: bookToSave.authors, // set authors to bookToSave.authors
+          description: bookToSave.description, // set description to bookToSave.description
+          title: bookToSave.title, // set title to bookToSave.title
+          bookId: bookToSave.bookId, // set bookId to bookToSave.bookId
+          image: bookToSave.image, // set image to bookToSave.image
+          link: bookToSave.link, // set link to bookToSave.link
         },
-        context: headers,
+        context: headers, // set context to headers
       });
 
-      if (!data) {
-        throw new Error("something went wrong!");
-      } else {
-        console.log("data", data);
+      if (!data) { // if data is null
+        throw new Error("something went wrong!"); // throw error
       }
 
-      setSavedBookIds([...savedBookIds, bookToSave.bookId]);
-    } catch (err) {
-      console.error("try error", err);
-      console.log("mutation error", error);
+      setSavedBookIds([...savedBookIds, bookToSave.bookId]); // set savedBookIds state to bookToSave.bookId
+    } catch (err) { // catch error
+      console.error("try error", err); // log try error
+      console.log("mutation error", error); // log mutation error
     }
   };
 
@@ -166,4 +164,4 @@ const SearchBooks = () => {
   );
 };
 
-export default SearchBooks;
+export default SearchBooks; // export SearchBooks component
