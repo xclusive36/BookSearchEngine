@@ -1,4 +1,4 @@
-const User = require('./User');
-const Book = require('./Book');
+const User = require("./User"); // import User model
+const Book = require("./Book"); // import Book model
 
-module.exports = { User, Book };
+module.exports = { User, Book }; // export User and Book models
