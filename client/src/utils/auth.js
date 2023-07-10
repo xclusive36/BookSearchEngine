@@ -1,48 +1,43 @@
-import decode from "jwt-decode"; // import decode from jwt-decode
+import decode from 'jwt-decode';
 
 class AuthService {
-  // create a new class called AuthService
   getProfile() {
-    // create getProfile method
-    return decode(this.getToken()); // use jwt-decode to decode the token
+    return decode(this.getToken());
   }
 
   loggedIn() {
-    // create loggedIn method
-    const token = this.getToken(); // get token from localStorage
-    return !!token && !this.isTokenExpired(token); // check if token exists and is not expired
+    const token = this.getToken();
+    // If there is a token and it's not expired, return `true`
+    return token && !this.isTokenExpired(token) ? true : false;
   }
 
   isTokenExpired(token) {
-    // create isTokenExpired method
-    try {
-      const decoded = decode(token); // decode token
-      if (decoded.exp < Date.now() / 1000) {
-        // check if token is expired and return true or false
-        return true;
-      } else return false;
-    } catch (err) {
-      // catch error
-      return false; // return false if error
+    // Decode the token to get its expiration time that was set by the server
+    const decoded = decode(token);
+    // If the expiration time is less than the current time (in seconds), the token is expired and we return `true`
+    if (decoded.exp < Date.now() / 1000) {
+      localStorage.removeItem('id_token');
+      return true;
     }
+    // If token hasn't passed its expiration time, return `false`
+    return false;
   }
 
   getToken() {
-    // create getToken method
-    return localStorage.getItem("id_token"); // retrieve token from localStorage
+    return localStorage.getItem('id_token');
   }
 
   login(idToken) {
-    // create login method
-    localStorage.setItem("id_token", idToken); // save token to localStorage
-    window.location.assign("/"); // reload window
+    localStorage.setItem('id_token', idToken);
+    window.location.assign('/');
   }
 
   logout() {
-    // create logout method
-    localStorage.removeItem("id_token"); // remove token from localStorage
-    window.location.assign("/"); // reload window
+    localStorage.removeItem('id_token');
+    window.location.reload();
   }
 }
 
-export default new AuthService(); // export AuthService
+const Auth = new AuthService();
+
+export default Auth;
