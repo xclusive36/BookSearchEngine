@@ -7,7 +7,9 @@ import Auth from "../utils/auth"; // import auth.js
 import { saveBookIds, getSavedBookIds } from "../utils/localStorage"; // import saveBookIds() and getSavedBookIds() from localStorage.js
 
 const SavedBooks = () => { // define SavedBooks functional component
-  const { loading, data } = useQuery(QUERY_ME); // use QUERY_ME query
+  const { loading, data } = useQuery(QUERY_ME, {
+    fetchPolicy: "no-cache" 
+  }); // use QUERY_ME query
   const [deleteBook, { error }] = useMutation(REMOVE_BOOK); // use REMOVE_BOOK mutation
   const [books, setBooks] = useState([]); // set books state to empty array
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds()); // set savedBookIds state to getSavedBookIds() function
